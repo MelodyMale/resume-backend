@@ -1,0 +1,28 @@
+name: Visitor Counting Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS credentials from Production account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::599497604578:role/github-action-lambda-role
+          aws-region: ap-southeast-2
+          role-duration-seconds: 1200
+          role-session-name: MySessionName
+      - name: zip Lambda Function
+        run: |
+          zip -r9 lambda.zip app.py
+      - name: AWS Deploy
+        run: |
+          aws lambda create-function --function-name VisitorCounting 
+          | --zip-file fileb://lambda.zip --runtime python3.9 
+          | --role arn:aws:iam::599497604578:role/LambdaDynamoDB
+          | --handler app.lambda_handler
