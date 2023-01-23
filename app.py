@@ -23,7 +23,7 @@ def lambda_handler(event, context):
         count += 1
         print("Change count to", count)
         dynamo.update_item(Key=key, AttributeUpdates={"count": {"Value": count}})
-        return {"result": "success"}
+        return {"result": "success", "count": count}
 
     operation = event["operation"]
 
