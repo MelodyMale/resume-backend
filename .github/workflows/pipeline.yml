@@ -25,7 +25,7 @@ jobs:
           zip -r9 lambda.zip app.py
       - name: AWS Deploy
         run: |
-          aws lambda create-function --function-name VisitorCounting \
+          aws lambda update-function-code --function-name VisitorCounting \
           --zip-file fileb://lambda.zip --runtime python3.9 \
           --role arn:aws:iam::599497604578:role/LambdaDynamoDB \
           --handler app.lambda_handler
