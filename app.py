@@ -1,33 +1,38 @@
 import boto3
 import json
 
-# define the DynamoDB table that Lambda will connect to
 tableName = "visitor"
+key = {"id": "loremipsum"}
+dynamo = boto3.resource("dynamodb").Table(tableName)
 
-# create the DynamoDB resource
-dynamo = boto3.resource('dynamodb').Table(tableName)
+print("Loading function")
 
-print('Loading function')
 
 def lambda_handler(event, context):
-    def ddb_read(x):
-        dynamo.get_item(**x)
+    def ddb_read():
+        print("Read visitor count")
+        item = dynamo.get_item(Key=key)
+        count = item["Item"]["count"]
+        print("Current count:", count)
+        return {"count": count}
 
-    def ddb_update(x):
-        dynamo.update_item(**x)
-        
-    def echo(x):
-        return x
+    def ddb_update():
+        print("Update vistor count")
+        result = ddb_read()
+        count = result["count"]
+        count += 1
+        print("Change count to", count)
+        dynamo.update_item(Key=key, AttributeUpdates={"count": {"Value": count}})
+        return {"result": "success"}
 
-    operation = event['operation']
+    operation = event["operation"]
 
     operations = {
-        'read': ddb_read,
-        'update': ddb_update,
-        'echo': echo,
+        "read": ddb_read,
+        "update": ddb_update,
     }
 
     if operation in operations:
-        return operations[operation](event.get('payload'))
+        return operations[operation]()
     else:
         raise ValueError('Unrecognized operation "{}"'.format(operation))
