@@ -19,7 +19,7 @@ jobs:
           role-to-assume: arn:aws:iam::599497604578:role/github-action-lambda-role
           aws-region: ap-southeast-2
           role-duration-seconds: 1200
-          role-session-name: MySessionName
+          role-session-name: GitHubActions
       - name: zip Lambda Function
         run: |
           zip -r9 lambda.zip app.py
